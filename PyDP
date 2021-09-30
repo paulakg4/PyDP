@@ -18,9 +18,23 @@ class PyDP():
         self.req_action = '&action=Select '
         self.req_params = field + ' from dp where donor_id = ' + donor_id
 
-        value = self.makeCall()
+        root = self.makeCall()
+        value = [x for x in root.iter('field')][0].attrib['value']
         return value
-        
+
+
+    def getCustomFieldValue(self, field, donor_id):
+
+        donor_id = str(donor_id)
+        self.req_action = '&action=Select '
+        self.req_params = field + ' from dpudf where donor_id = ' + donor_id
+
+        root = self.makeCall()
+        value = [x for x in root.iter('field')][0].attrib['value']
+
+        return value
+
+
 
     def makeCall(self):
 
@@ -30,6 +44,5 @@ class PyDP():
 
 
         root = ElementTree.fromstring(r.content)
-        result_value = [x for x in root.iter('field')][0].attrib['value']
 
-        return result_value
+        return root
