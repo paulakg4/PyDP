@@ -9,9 +9,11 @@ Coding is a hobby for me and there will probably be better ways to do what I've 
 Example Usage:
 
 from PyDP import *
+
 dp = PyDP()
 
 fieldname = "first_name"
+
 donorid = 1
 
 dp.getFieldValue(fieldname, donorid)
