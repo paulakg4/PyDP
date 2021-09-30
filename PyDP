@@ -1,0 +1,35 @@
+from requests_xml import XMLSession
+from xml.etree import ElementTree
+
+
+class PyDP():
+
+    def __init__(self, api_key):
+
+        self.req_api = '?apikey=' + api_key
+        self.req_url = 'https://www.donorperfect.net/prod/xmlrequest.asp'
+        self.req_action = ''
+        self.req_params = ''
+
+
+    def getFieldValue(self, field, donor_id):
+
+        donor_id = str(donor_id)
+        self.req_action = '&action=Select '
+        self.req_params = field + ' from dp where donor_id = ' + donor_id
+
+        value = self.makeCall()
+        return value
+        
+
+    def makeCall(self):
+
+        api_request = self.req_url + self.req_api + self.req_action + self.req_params
+        session = XMLSession()
+        r = session.get(api_request)
+
+
+        root = ElementTree.fromstring(r.content)
+        result_value = [x for x in root.iter('field')][0].attrib['value']
+
+        return result_value
