@@ -1,6 +1,6 @@
 from requests_xml import XMLSession
 from xml.etree import ElementTree
-
+from datetime import date
 
 class PyDP():
 
@@ -10,6 +10,8 @@ class PyDP():
         self.req_url = 'https://www.donorperfect.net/prod/xmlrequest.asp'
         self.req_action = ''
         self.req_params = ''
+
+        self.today = date.today().strftime("%m/%d/%Y")
 
 
     def getFieldValue(self, field, donor_id):
@@ -29,11 +31,35 @@ class PyDP():
         self.req_action = '&action=Select '
         self.req_params = field + ' from dpudf where donor_id = ' + donor_id
 
-        root = self.makeCall()
-        value = [x for x in root.iter('field')][0].attrib['value']
+        reply = self.makeCall()
+        value = [x for x in reply.iter('field')][0].attrib['value']
 
         return value
 
+    def createContact(self, donor_id, activity_code='', by_whom = '', mailing_code='', contact_date='', due_date='', due_time='', comment='', completed_date='', document_path='', user_id=''):
+        ## If no contact date is given, use todays date
+        if not contact_date:
+            contact_date = self.today
+
+        self.req_action = '&action=dp_savecontact '
+        self.req_params = '&params=@contact_id=0'
+        self.req_params += ', @donor_id=' + str(donor_id)
+        self.req_params += ", @activity_code= '" + activity_code + "'"
+        self.req_params += ", @by_whom= '" + by_whom + "'"
+        self.req_params +=", @mailing_code= '" + str(mailing_code) + "'"
+        self.req_params += ", @contact_date= '" + str(contact_date) + "'"
+        self.req_params += ", @due_date= '" + str(due_date) + "'"
+        self.req_params += ", @due_time= '" + str(due_time) + "'"
+        self.req_params += ", @completed_date= '" + str(completed_date) + "'"
+        self.req_params += ", @document_path= '" + str(document_path) + "'"
+        self.req_params += ", @comment= '" + str(comment) + "'"
+        self.req_params += ", @user_id= '" + str(user_id) + "'"
+
+        reply = self.makeCall()
+        value = [x for x in reply.iter('field')][0].attrib['value']
+
+        # Returns 
+        return value
 
 
     def makeCall(self):
