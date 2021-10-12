@@ -6,7 +6,7 @@ This is a project I decided to work on to make my life easier when i need to do 
 Coding is a hobby for me and there will probably be better ways to do what I've done. This is also the first time I've worked with XML data. Feel free to contribute.
 
 
-Example Usages:
+##Example Usages:
 ### Create Instance
 ```
 from PyDP import *
