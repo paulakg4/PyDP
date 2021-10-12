@@ -34,11 +34,9 @@ getCodes = dp.getCodes("SOLICIT_CODE")
 ```
 ### Update a donor (default DP fields only)
 ```
-update_donor = dp.updateDonor(donor_id=34980, narrative="hello there")
-print(update_donor)
+update_donor = dp.updateDonor(donor_id=34980, narrative="Has a lot of money")
 ```
 ### Update a donor udf code
 ```
-update_udf = dp.updateDonorUDF(donor_id=34980, field_name="spons_child", data_type="C", char_value="JT1010 \nDU1234")
-print(update_udf)
+update_udf = dp.updateDonorUDF(donor_id=34980, field_name="custom_fieldname", data_type="C", char_value="Some text to put in your custom field")
 ```
