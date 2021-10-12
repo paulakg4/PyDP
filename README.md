@@ -20,7 +20,7 @@ dp = PyDP()
 ```
 fieldname = "first_name"
 donorid = 1
-dp.getFieldValue(fieldname, donorid)
+value = dp.getFieldValue(fieldname, donorid)
 
 # Returns field value
 ```
