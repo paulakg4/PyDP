@@ -1,9 +1,9 @@
 # PyDP
 ## PyDP is a Python class for interacting with the DonorPerfect API
 
-This is a project I decided to work on to make my life easier when i need to do some automation in DonorPerfect. I will push updates as they are made. 
+This is a project I decided to work on to make my life easier when i need to do some automation in DonorPerfect. The goal is ease of use. There is still a lot of work to do but is somewhat usable now. I will push updates as they are made. 
 
-Coding is a hobby for me and there will probably be better ways to do what I've done. This is also the first time I've worked with XML data. Feel free to contribute.
+Coding is a hobby for me and there will probably be better ways to do what I've done. Feel free to use and/or contribute.
 
 
 
