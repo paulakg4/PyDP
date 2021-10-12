@@ -2,6 +2,8 @@ from requests_xml import XMLSession
 from xml.etree import ElementTree
 from datetime import date
 
+#TODO: finish documentation
+
 class PyDP():
 
     def __init__(self, api_key):
@@ -48,7 +50,8 @@ class PyDP():
     def getCodes(self, fieldname):
         self.req_action = '&action=Select '
         self.req_params = "top 500 code, description from dpcodes where field_name = '{}' order by code".format(fieldname)
-
+        #TODO: currently theres a limit of 500 codes
+        
         root = self.makeCall()
         # for x in root:
         #     print(x[0].attrib['value'])
