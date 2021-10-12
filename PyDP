@@ -15,60 +15,165 @@ class PyDP():
 
 
     def getFieldValue(self, field, donor_id):
+        '''
+        Get the value of a DP field
 
-        donor_id = str(donor_id)
+        :param field:
+        :param donor_id:
+        :return:
+        '''
         self.req_action = '&action=Select '
-        self.req_params = field + ' from dp where donor_id = ' + donor_id
+        self.req_params = '{} from dp where donor_id = {}'.format(field, donor_id)
 
         root = self.makeCall()
         value = [x for x in root.iter('field')][0].attrib['value']
         return value
 
-
     def getCustomFieldValue(self, field, donor_id):
+        '''
+        Get the value of a user defined field
 
-        donor_id = str(donor_id)
+        :param field:
+        :param donor_id:
+        :return:
+        '''
+
         self.req_action = '&action=Select '
-        self.req_params = field + ' from dpudf where donor_id = ' + donor_id
+        self.req_params = '{} from dpudf where donor_id = {}'.format(field, donor_id)
 
         reply = self.makeCall()
         value = [x for x in reply.iter('field')][0].attrib['value']
+        return value
+
+    def getCodes(self, fieldname):
+        self.req_action = '&action=Select '
+        self.req_params = "top 500 code, description from dpcodes where field_name = '{}' order by code".format(fieldname)
+
+        root = self.makeCall()
+        # for x in root:
+        #     print(x[0].attrib['value'])
+        #     print(x[1].attrib['value'])
+        #Simplified version of below
+
+        value = [(x[0].attrib['value'], x[1].attrib['value']) for x in root]
+
 
         return value
 
-    def createContact(self, donor_id, activity_code='', by_whom = '', mailing_code='', contact_date='', due_date='', due_time='', comment='', completed_date='', document_path='', user_id=''):
+
+
+    def createContact(self, donor_id, activity_code='', mailing_code='',  by_whom = '', contact_date='', due_date='', due_time='', completed_date='', comment='', document_path='', user_id=''):
+        '''
+        Create a contact entry in DP. The only field required is Donor ID. Contact date will default to today if not provided.
+
+        :param donor_id: Enter the Donor ID of the donor for whom the contact record is to be created or retrieved
+        :param activity_code: CODE value for the Activity Code field. See DPO Settings > Code Maintenance > Activity Code / Contact Screen. The required values will be listed in the Code column of the resulting display.
+        :param mailing_code:
+        :param by_whom:
+        :param contact_date:
+        :param due_date:
+        :param due_time:
+        :param completed_date:
+        :param comment:
+        :param document_path:
+        :param user_id:
+        :return: Returns the contact_id if successful
+        '''
+
+
+        self.req_action = '&action=dp_savecontact'
+
         ## If no contact date is given, use todays date
         if not contact_date:
             contact_date = self.today
 
-        self.req_action = '&action=dp_savecontact '
-        self.req_params = '&params=@contact_id=0'
-        self.req_params += ', @donor_id=' + str(donor_id)
-        self.req_params += ", @activity_code= '" + activity_code + "'"
-        self.req_params += ", @by_whom= '" + by_whom + "'"
-        self.req_params +=", @mailing_code= '" + str(mailing_code) + "'"
-        self.req_params += ", @contact_date= '" + str(contact_date) + "'"
-        self.req_params += ", @due_date= '" + str(due_date) + "'"
-        self.req_params += ", @due_time= '" + str(due_time) + "'"
-        self.req_params += ", @completed_date= '" + str(completed_date) + "'"
-        self.req_params += ", @document_path= '" + str(document_path) + "'"
-        self.req_params += ", @comment= '" + str(comment) + "'"
-        self.req_params += ", @user_id= '" + str(user_id) + "'"
+        self.req_params = "&params=@contact_id=0, @donor_id={}, @activity_code='{}', @mailing_code='{}', @by_whom='{}', @contact_date='{}', @due_date={}, @due_time='{}', @completed_date={}, @comment='{}', @document_path='{}', @user_id='{}'".format(donor_id,activity_code,mailing_code,by_whom,contact_date,self.wrapField(due_date),due_time,self.wrapField(completed_date),comment,document_path,user_id)
 
         reply = self.makeCall()
         value = [x for x in reply.iter('field')][0].attrib['value']
-
-        # Returns 
         return value
 
+    def updateDonor(self, donor_id, first_name='', last_name='', middle_name='', suffix='', title='', salutation='', prof_title='', opt_line='', address='', address2='', city='', state='', zip='', country='', address_type='', home_phone='', business_phone='', fax_phone='', mobile_phone='', email='', org_rec='', donor_type='', nomail='', nomail_reason='', narrative='', donor_rcpt_type='',user_id='', udf_fields=[]):
+
+
+        # All values have to be sent so we retrieve them all then update the ones we want
+        self.req_action = "&action=Select "
+        self.req_params = " first_name, last_name, middle_name, suffix, title, salutation, prof_title, opt_line, address, address2, city, state, zip, country, address_type, home_phone, business_phone, fax_phone, mobile_phone, email, org_rec, donor_type, nomail, nomail_reason, narrative, donor_rcpt_type from dp where donor_id = {}".format(donor_id)
+        root = self.makeCall()
+        vals = []
+        [vals.append(x.attrib['value']) for x in root[0]]
+
+        if not first_name: first_name = vals[0]
+        if not last_name: last_name = vals[1]
+        if not middle_name: middle_name = vals[2]
+        if not suffix: suffix = vals[3]
+        if not title: title = vals[4]
+        if not salutation: salutation = vals[5]
+        if not prof_title: prof_title = vals[6]
+        if not opt_line: opt_line = vals[7]
+        if not address: address = vals[8]
+        if not address2: address2 = vals[9]
+        if not city: city = vals[10]
+        if not state: state = vals[11]
+        if not zip: zip = vals[12]
+        if not country: country = vals[13]
+        if not address_type: address_type = vals[14]
+        if not home_phone: home_phone = vals[15]
+        if not business_phone: business_phone = vals[16]
+        if not fax_phone: fax_phone = vals[17]
+        if not mobile_phone: mobile_phone = vals[18]
+        if not email: email = vals[19]
+        if not org_rec: org_rec = vals[20]
+        if not donor_type: donor_type = vals[21]
+        if not nomail: nomail = vals[22]
+        if not nomail_reason: nomail_reason = vals[23]
+        if not narrative: narrative = vals[24]
+        if not donor_rcpt_type: donor_rcpt_type = vals[25]
+
+        self.req_action = '&action=dp_savedonor'
+        self.req_params = "&params=@donor_id={} ,@first_name={} ,@last_name={} ,@middle_name={} ,@suffix={} ,@title={} ,@salutation={} ,@prof_title={} ,@opt_line={} ,@address={} ,@address2={} ,@city={} ,@state={} ,@zip={} ,@country={} ,@address_type={} ,@home_phone={} ,@business_phone={} ,@fax_phone={} ,@mobile_phone={} ,@email={} ,@org_rec={} ,@donor_type={} ,@nomail={} ,@nomail_reason={} ,@narrative={} , @donor_rcpt_type={}, @user_id={}".format(
+            donor_id, self.wrapField(first_name), self.wrapField(last_name), self.wrapField(middle_name), self.wrapField(suffix), self.wrapField(title), self.wrapField(salutation), self.wrapField(prof_title),
+            self.wrapField(opt_line), self.wrapField(address), self.wrapField(address2), self.wrapField(city), self.wrapField(state), self.wrapField(zip), self.wrapField(country), self.wrapField(address_type), self.wrapField(home_phone),
+            self.wrapField(business_phone), self.wrapField(fax_phone), self.wrapField(mobile_phone), self.wrapField(email), self.wrapField(org_rec), self.wrapField(donor_type), self.wrapField(nomail),
+            self.wrapField(nomail_reason), self.wrapField(narrative), self.wrapField(donor_rcpt_type), self.wrapField(user_id)
+        )
+
+        reply = self.makeCall()
+        value = [x for x in reply.iter('field')][0].attrib['value']
+        return value
+
+    def updateDonorUDF(self, donor_id, field_name, data_type='C', char_value='', date_value='', number_value='', user_id=''):
+        data_types = ['C', 'D', 'N']
+        if data_type not in data_types:
+            raise ValueError("Invalid data type. Expected one of: %s" % sim_types)
+
+        #TODO: Might need to make an exception if the data type is Number
+
+        self.req_action = "&action=dp_save_udf_xml"
+        self.req_params = "&params=@matching_id={},@field_name={},@data_type={},@char_value={},@date_value={},@number_value={},@user_id={}".format(donor_id, self.wrapField(field_name), self.wrapField(data_type), self.wrapField(char_value), self.wrapField(date_value), self.wrapField(number_value), self.wrapField(user_id))
+        reply = self.makeCall()
+        value = [x for x in reply.iter('field')][0].attrib['value']
+        return value
+
+    def wrapField(self, field):
+        '''
+        Blank fields need a NULL value, otherwise the field needs to be wrapped in quotes
+        :param field: field to wrap or make NULL
+        :return: wrapped field as text
+        '''
+        if field: field = "'{}'".format(field)
+        else: field = "NULL"
+        return field
 
     def makeCall(self):
-
+        '''
+        Takes the value of req_api, req_action, req_params and makes call to the dp api.
+        :return: Returns the root from ElementTree
+        '''
         api_request = self.req_url + self.req_api + self.req_action + self.req_params
         session = XMLSession()
         r = session.get(api_request)
 
 
         root = ElementTree.fromstring(r.content)
-
         return root
